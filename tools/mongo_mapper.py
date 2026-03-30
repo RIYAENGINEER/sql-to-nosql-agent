@@ -1,4 +1,4 @@
-from sql_parser import parse_sql
+from tools.sql_parser import parse_sql
 
 
 def map_operator(op:str):
@@ -40,9 +40,4 @@ def map_to_mongo(parsed: dict) -> dict:
         "limit":parsed["limit"]
     }
 
-query="SELECT name, age FROM users WHERE age > 25 LIMIT 5"
 
-parsed = parse_sql(query)
-mongo = map_to_mongo(parsed)
-
-print(mongo)
