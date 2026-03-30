@@ -98,8 +98,4 @@ def parse_value(val:str):
     return val
 
 
-query = "SELECT name, age from users WHERE age > 25 LIMIT 5"
 
-print(parse_sql(query))
-
-#testttt

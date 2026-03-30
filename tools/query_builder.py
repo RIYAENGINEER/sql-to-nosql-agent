@@ -1,5 +1,5 @@
-from sql_parser import parse_sql
-from mongo_mapper import map_to_mongo
+from tools.sql_parser import parse_sql
+from tools.mongo_mapper import map_to_mongo
 
 def dict_to_mongo_str(d):
     if not isinstance(d, dict):
@@ -31,10 +31,3 @@ def build_query(mongo_dict: dict) -> str:
 
     return query
 
-query = "SELECT name, age FROM users WHERE age > 25 LIMIT 5"
-
-parsed = parse_sql(query)
-mongo = map_to_mongo(parsed)
-final_query = build_query(mongo)
-
-print(final_query)
