@@ -52,7 +52,7 @@ Return only the MongoDB query.
 if __name__ == "__main__":
     agent = SQLToMongoAgent()
 
-    query = "SELECT department, COUNT(*) FROM employees GROUP BY department"
+    query = "SELECT users.name, orders.amount FROM users JOIN orders ON users.id = orders.user_id"
 
     result = agent.run(query)
 

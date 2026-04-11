@@ -14,6 +14,24 @@ def to_mongo(parsed: dict) -> dict:
 
                 ]
             }
+        
+
+    if parsed.get("join"):
+        join = parsed["join"]
+
+        return {
+            "collection" : parsed["collection"],
+            "pipeline":[
+                {
+                    "$lookup": {
+                        "from":join["table"],
+                        "localfield": join["local_field"],
+                        "foreignfield" : join["foreign_field"],
+                        "as": join["table"]
+                    }
+                }
+            ]
+        }
     filter_ = parsed["filter"]
     projection = {field: 1 for field in parsed["projection"]}
 
