@@ -12,7 +12,9 @@ def parse_sql(query: str) -> dict:
         "collection": None,
         "projection": [],
         "filter" : {},
-        "limit": None 
+        "limit": None, 
+        "group_by" : None,
+        "aggregation": None
     }
     
     for token in parsed.tokens:
@@ -51,6 +53,20 @@ def parse_sql(query: str) -> dict:
                             operator: parse_value(right)
                         }
                     }
+            
+        elif token.ttype is Keyword and token.value.upper() == "GROUP BY":
+            group_index = parsed.tokens.index(token) + 2
+
+            group_token = parsed.tokens[group_index]
+
+            if isinstance(group_token, Identifier):
+                result["group_by"] = group_token.get_name()
+
+            else:
+                result["group_by"] = group_token.value.lower()
+
+            if any("COUNT" in str(t).upper() for t in parsed.tokens):
+                result["aggregation"] = "count"
 
         elif token.ttype is Keyword and token.value.upper() == "LIMIT":
 
