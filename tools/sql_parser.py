@@ -12,7 +12,12 @@ def parse_sql(query: str) -> dict:
         "collection": None,
         "projection": [],
         "filter" : {},
-        "limit": None 
+        "limit": None, 
+        "group_by" : None,
+        "aggregation": None,
+        "join": None
+
+        
     }
     
     for token in parsed.tokens:
@@ -51,6 +56,53 @@ def parse_sql(query: str) -> dict:
                             operator: parse_value(right)
                         }
                     }
+            
+        elif token.ttype is Keyword and token.value.upper() == "GROUP BY":
+            group_index = parsed.tokens.index(token) + 2
+
+            group_token = parsed.tokens[group_index]
+
+            if isinstance(group_token, Identifier):
+                result["group_by"] = group_token.get_name()
+
+            else:
+                result["group_by"] = group_token.value.lower()
+
+            if any("COUNT" in str(t).upper() for t in parsed.tokens):
+                result["aggregation"] = "count"
+
+        elif token.ttype is Keyword and token.value.upper() =="JOIN":
+            join_index = parsed.tokens.index(token) + 2
+            join_token = parsed.tokens[join_index]
+
+            if isinstance(join_token, Identifier):
+                join_table = join_token.get_real_name()
+
+            else:
+                join_table = join_token.value.lower()
+
+            result["join"] = {
+                "table": join_table,
+                "local_field" : None,
+                "foreign_field": None
+            }
+
+        elif token.ttype is Keyword and token.value.upper() =="ON":
+            on_index = parsed.tokens.index(token) + 2
+            condition = parsed.tokens[on_index].value.strip()
+
+            left,right = condition.split("=")
+
+            def extract_column(expr):
+                expr = expr.strip()
+                if "." in expr:
+                    return expr.split(".")[1]
+                return expr
+            
+            if result.get("join"):
+                result["join"]["local_field"] = extract_column(left)
+                result["join"]["foreign_field"] = extract_column(right)
+
 
         elif token.ttype is Keyword and token.value.upper() == "LIMIT":
 

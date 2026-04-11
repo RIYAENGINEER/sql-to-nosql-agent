@@ -5,10 +5,11 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from tools.sql_parser import parse_sql
-from tools.mongo_mapper import map_to_mongo
-from tools.query_builder import build_query
+#from tools.mongo_mapper import map_to_mongo
+#from tools.query_builder import build_query
 from utils.ollama_client import generate_with_ollama
-
+from adapter.mongo_adapter import to_mongo
+from adapter.mongo_builder import build_mongo_query
 
 class SQLToMongoAgent:
 
@@ -35,10 +36,10 @@ Return only the MongoDB query.
         parsed = parse_sql(query)
         print("\n[Parsed SQL]:", parsed)
 
-        mongo = map_to_mongo(parsed)
+        mongo = to_mongo(parsed)
         print("\n[Mongo Mapping]:", mongo)
 
-        final_query = build_query(mongo)
+        final_query = build_mongo_query(mongo)
         print("\n[Final Query]:", final_query)
 
         return {
@@ -51,7 +52,7 @@ Return only the MongoDB query.
 if __name__ == "__main__":
     agent = SQLToMongoAgent()
 
-    query = "SELECT name, age FROM users WHERE age > 25 LIMIT 5"
+    query = "SELECT users.name, orders.amount FROM users JOIN orders ON users.id = orders.user_id"
 
     result = agent.run(query)
 
